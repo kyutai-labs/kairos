@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Local env
+.env
+
+# Tool caches
+.mypy_cache/
+.ruff_cache/
+
+# SLURM / runtime outputs
+slurm_logs/
+/data/
+/results/

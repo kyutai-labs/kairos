@@ -1,0 +1,116 @@
+[project]
+name = "kairos"
+version = "0.1.0"
+description = "Temporal knowledge learning during LLM's pretraining"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "absl-py",
+    "beartype>=0.21.0",
+    "chex",
+    "datasets>=4.7",
+    "einops",
+    "etils",
+    "flash-attn3-jax",
+    "flax",
+    "huggingface-hub>=1.15.0",
+    "jax[cuda12]",
+    "jaxtyping>=0.3.2",
+    "jupyter>=1.1.1",
+    "levenshtein>=0.27.3",
+    "ml-dtypes",
+    "nest-asyncio",
+    "notebook>=7.4.7",
+    "numpy",
+    "openai>=2.8.1",
+    "optax",
+    "orbax-checkpoint",
+    "ott-jax>=0.6.0",
+    "pydantic>=2.11.7",
+    "pydantic-settings>=2.10.1",
+    "pynvml>=13.0.1",
+    "python-dotenv",
+    "pytest>=8.4.1",
+    "python-liquid>=2.1.0",
+    "pyyaml",
+    "rapidfuzz>=3.14.3",
+    "rich",
+    "sacrebleu>=2.5.1",
+    "safetensors",
+    "seaborn>=0.13.2",
+    "sentencepiece",
+    "tokenizers",
+    "torch>=2.10.0",
+    "transformers>=4.56.2",
+    "yomikomi>=0.3.4",
+]
+
+
+[tool.ruff]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "F",   # pyflakes (includes unused imports)
+    "PTH", # flake8-use-pathlib
+    "UP",  # pyupgrade
+    "I",   # isort
+]
+ignore = [
+    "F722",  # forward reference syntax error
+]
+
+[tool.ruff.format]
+# Defaults: double quotes, space indent, line-length=88, LF.
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unreachable = true
+check_untyped_defs = true
+
+# HF transformers stubs are incomplete (AutoTokenizer/AutoModelForCausalLM lose
+# concrete subclass attributes after from_pretrained). Silence those modules.
+[[tool.mypy.overrides]]
+module = [
+    "kairos.evaluate",
+    "kairos.evaluation.evaluate_taqa",
+    "kairos.evaluation.olmes.evaluate",
+    "kairos.inference.interactive_temporal",
+]
+disable_error_code = ["attr-defined", "union-attr", "call-arg", "arg-type", "index", "operator", "assignment", "misc"]
+
+# jax/flax cache types are deeply nested unions that don't roundtrip through mypy.
+[[tool.mypy.overrides]]
+module = [
+    "kairos.inference.generate",
+    "kairos.nn.transformer",
+]
+disable_error_code = ["assignment", "arg-type", "union-attr", "list-item", "return-value", "call-overload"]
+
+[project.scripts]
+interactive-temporal = "kairos.inference.interactive_temporal:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[[tool.uv.index]]
+name = "pytorch-cu129"
+url = "https://download.pytorch.org/whl/cu129"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu129" }]
+torchvision = [{ index = "pytorch-cu129" }]
+torchaudio = [{ index = "pytorch-cu129" }]
+
+[dependency-groups]
+dev = [
+    "ipython>=9.4.0",
+    "mypy>=1.13",
+    "pre-commit>=4.3.0",
+    "ruff>=0.13.2",
+]
